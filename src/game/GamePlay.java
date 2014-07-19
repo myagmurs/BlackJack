@@ -50,7 +50,7 @@ public class GamePlay {
 			System.out.println(game.getGamePlayer().getName() + ", you have " + game.getGamePlayer().getChips() + " chips");
 			System.out.println("How many chips you want to bet?");
 			bet = scan.nextInt();
-		} while(bet <= leastBet && bet <= game.getGamePlayer().getChips());
+		} while(bet <= leastBet || bet > game.getGamePlayer().getChips());
 		game.getBet().setPlayerChips(bet);
 		game.getGamePlayer().setChips(game.getGamePlayer().getChips()-bet);
 	}
