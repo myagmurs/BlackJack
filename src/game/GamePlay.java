@@ -15,10 +15,12 @@ public class GamePlay {
 	
 	private static boolean dealerFlag = false;
 	
+	final static int leastBet = 1;
+	
 	public static void main(String[] args) {		
 		Game game = new Game();
 		game.initGame();
-		
+
 		// initial distribution of cards
 		initGamePlay(game);
 		
@@ -42,26 +44,44 @@ public class GamePlay {
 		}		
 	}
 
+	private static void askForBets(Game game) {
+		int bet;
+		do {
+			System.out.println(game.getGamePlayer().getName() + ", you have " + game.getGamePlayer().getChips() + " chips");
+			System.out.println("How many chips you want to bet?");
+			bet = scan.nextInt();
+		} while(bet <= leastBet && bet <= game.getGamePlayer().getChips());
+		game.getBet().setPlayerChips(bet);
+		game.getGamePlayer().setChips(game.getGamePlayer().getChips()-bet);
+	}
+
 	private static void initGamePlay(Game game) {
 		playerFlag = true;
 		gamePlayFlag = true;
 		dealerFlag = false;
+		askForBets(game);
 		turnInitial(game.getDeckOfCards(), game.getGamePlayers());
 		turnInitial(game.getDeckOfCards(), game.getGamePlayers());
 		checkHandsInitial(game);
 	}
 	
 	private static void askForReplay(Game game) {
-		String replay;
-		do {
-			System.out.println("Do you want to play again?(y/n)");
-			replay = scan.next();
-		} while(!"y".equals(replay) && !"n".equals(replay));
-		if("y".equals(replay)) {
-			game.resetGame();
-			initGamePlay(game);
-		} else {
+		if(game.getGamePlayer().getChips() < leastBet) {
+			System.out.println(game.getGamePlayer().getName() + ", you don't have enough cheaps to replay.");
 			System.out.println("Thanks for playing");
+		} else {
+			String replay;
+			do {
+				System.out.println(game.getGamePlayer().getName() + ", you have " + game.getGamePlayer().getChips() + " remaining.");
+				System.out.println("Do you want to play again?(y/n)");
+				replay = scan.next();
+			} while(!"y".equals(replay) && !"n".equals(replay));
+			if("y".equals(replay)) {
+				game.resetGame();
+				initGamePlay(game);
+			} else {
+				System.out.println("Thanks for playing");
+			}
 		}
 	}
 	
@@ -111,6 +131,9 @@ public class GamePlay {
 				System.out.println(game.getGamePlayer().getName() + " has hit to Blackjack too");
 				openAllHands(game);
 				System.out.println("The game finished with push");
+				game.getPlayer().setChips(game.getPlayer().getChips() + game.getBet().getPlayerChips());
+				askForReplay(game);
+				return;
 			}
 			openAllHands(game);
 			askForReplay(game);
@@ -133,7 +156,14 @@ public class GamePlay {
 		for(Gamer gamer : game.getGamePlayers()) {
 			if(gamer.isBusted()) {
 				System.out.println(gamer.getName() +  " is busted.");
-				System.out.println("The winner is " + game.getGamePlayers().get(1-game.getGamePlayers().indexOf(gamer)).getName());
+				Gamer winner = game.getGamePlayers().get(1-game.getGamePlayers().indexOf(gamer));
+				System.out.println("The winner is " + winner.getName());
+				if(winner instanceof Player) {
+					((Player) winner).setChips(((Player) winner).getChips()+game.getBet().getPlayerChips()*2);
+					System.out.println(winner.getName() + ", you won " + game.getBet().getPlayerChips() + " chips.");
+				} else {
+					System.out.println(gamer.getName() + ", you lost " + game.getBet().getPlayerChips() + " chips.");
+				}
 				return;
 			}
 		}
@@ -141,10 +171,13 @@ public class GamePlay {
 		int hand1 = openHand(game.getGamePlayer());
 		if(hand0 == hand1) {
 			System.out.println("Both Dealer and Player hit the same value, no winner");
+			game.getPlayer().setChips(game.getPlayer().getChips() + game.getBet().getPlayerChips());
 		} else if(hand0 > hand1) {
 			System.out.println("The winner is: " + game.getGameDealer().getName());
+			System.out.println(game.getGamePlayer().getName() + ", you lost " + game.getBet().getPlayerChips() + " chips.");
 		} else {
 			System.out.println("The winner is: " + game.getGamePlayer().getName());
+			System.out.println(game.getGamePlayer().getName() + ", you won " + game.getBet().getPlayerChips() + " chips.");
 		}
 	}
 	

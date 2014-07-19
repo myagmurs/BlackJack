@@ -6,9 +6,13 @@ import java.util.List;
 
 public class Game {
 	
+	final private int initialPlayerChips = 100;
+	
 	private Dealer dealer;
 	
 	private Player player;
+	
+	private Bet bet;
 	
 	private List<Gamer> gamePlayers = new ArrayList<Gamer>();
 	
@@ -21,6 +25,7 @@ public class Game {
 	public void initGame() {
 		this.dealer = new Dealer("Dealer", true, false, false);
 		this.player = new Player("Player", true, false, false);
+		this.player.setChips(initialPlayerChips);
 		this.gamePlayers.add(dealer);
 		this.gamePlayers.add(player);
 
@@ -28,6 +33,9 @@ public class Game {
 		Deck deck = new Deck();
 		this.deckOfCards = new ArrayList<Card>(Arrays.asList(deck.createDeck()));
 		deck.shuffleDeck(this.deckOfCards);
+		
+		//initialization of bet
+		this.bet = new Bet();
 	}
 	
 	public void resetGame() {
@@ -44,6 +52,7 @@ public class Game {
 		Deck deck = new Deck();
 		this.deckOfCards = new ArrayList<Card>(Arrays.asList(deck.createDeck()));
 		deck.shuffleDeck(this.deckOfCards);
+		this.setBet(new Bet());
 	}
 
 	public Dealer getDealer() {
@@ -84,6 +93,14 @@ public class Game {
 	
 	public Dealer getGameDealer() {
 		return (Dealer) this.gamePlayers.get(0);
+	}
+
+	public Bet getBet() {
+		return bet;
+	}
+
+	public void setBet(Bet bet) {
+		this.bet = bet;
 	}
 
 }
